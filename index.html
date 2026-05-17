@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متاهة الخير - طبق اللحمة</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #2F3E46;
+            --light: #F7FFF7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+            border: 3px solid #f0f0f0;
+        }
+
+        h1 { color: var(--primary); margin-bottom: 5px; font-size: 28px; }
+        .subtitle { color: #666; margin-bottom: 25px; font-size: 15px; }
+        
+        input[type="text"] {
+            width: 90%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 25px;
+            outline: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        input[type="text"]:focus { border-color: var(--secondary); }
+
+        .avatar-selection {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+
+        .avatar-box {
+            border: 3px solid #eee;
+            border-radius: 20px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 42%;
+            background: #fafafa;
+        }
+
+        .avatar-box:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+        .avatar-box.selected {
+            border-color: var(--secondary);
+            background-color: #eefcfb;
+            transform: scale(1.05);
+        }
+
+        .avatar-img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+
+        .avatar-box p { margin: 5px 0 0 0; font-weight: bold; color: var(--dark); }
+
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 10px rgba(78, 205, 196, 0.3);
+            transition: all 0.2s;
+            width: 90%;
+        }
+
+        button:hover { background-color: #3dbdb4; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+
+        .hidden { display: none !important; }
+
+        /* شاشة اللعبة والمسار */
+        .track {
+            width: 100%;
+            height: 25px;
+            background: #eee;
+            border-radius: 15px;
+            position: relative;
+            margin: 50px 0 40px 0;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            width: 0%;
+            border-radius: 15px;
+            transition: width 0.4s ease-out;
+        }
+
+        .player-token-img {
+            position: absolute;
+            top: -45px;
+            left: 0%;
+            transform: translateX(-50%);
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary);
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: left 0.4s ease-out;
+        }
+
+        .target-box {
+            position: absolute;
+            left: 100%;
+            top: -25px;
+            transform: translateX(-50%);
+            font-size: 35px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .stat-box {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: var(--primary);
+            background: #fff5f5;
+            padding: 10px;
+            border-radius: 15px;
+            display: inline-block;
+            padding: 10px 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="card">
+        <h1>متاهة الخير ✨</h1>
+        <p class="subtitle">سجل اسمك واختار متطوعك عشان تبدأ الرحلة لطبق اللحمة!</p>
+        
+        <input type="text" id="username" placeholder="اكتب اسمك هنا...">
+        
+        <div class="avatar-selection">
+            <div class="avatar-box" id="boy-avatar" onclick="selectAvatar('boy', 'https://i.postimg.cc/T38YDJZ6/boy-avatar.png')">
+                <img src="https://i.postimg.cc/T38YDJZ6/boy-avatar.png" class="avatar-img" alt="متطوع">
+                <p>متطوع 🧑‍🦱</p>
+            </div>
+            <div class="avatar-box" id="girl-avatar" onclick="selectAvatar('girl', 'https://i.postimg.cc/9FmX0Lgq/girl-avatar.png')">
+                <img src="https://i.postimg.cc/9FmX0Lgq/girl-avatar.png" class="avatar-img" alt="متطوعة">
+                <p>متطوعة 👧</p>
+            </div>
+        </div>
+
+        <button onclick="startGame()">ابدأ رحلة الخير 🚀</button>
+    </div>
+
+    <div id="game-screen" class="card hidden">
+        <h2 id="welcome-msg">مرحباً!</h2>
+        <p style="color: #666;">كل تبرع بـ 20 جنيه بيحركك خطوة للهدف</p>
+        
+        <div class="stat-box"><span id="current-amount">0</span> / 400 ج</div>
+
+        <div class="track">
+            <div id="progress" class="progress-bar"></div>
+            <img id="player-img" class="player-token-img" src="https://i.postimg.cc/T38YDJZ6/boy-avatar.png" alt="اللاعب">
+            <div class="target-box">🥩</div>
+        </div>
+
+        <button onclick="addDonation()" style="background-color: var(--primary); box-shadow: 0 5px 10px rgba(255, 107, 107, 0.3);">إضافة تبرع (+20 ج) 💰</button>
+    </div>
+
+    <script>
+        // روابط الصور مقصوصة ومرفوعة جاهزة للاستخدام
+        let selectedAvatarUrl = 'https://i.postimg.cc/T38YDJZ6/boy-avatar.png'; 
+        let currentAmount = 0;
+        let username = "";
+
+        function selectAvatar(type, imgUrl) {
+            document.getElementById('boy-avatar').classList.remove('selected');
+            document.getElementById('girl-avatar').classList.remove('selected');
+            
+            document.getElementById(type + '-avatar').classList.add('selected');
+            selectedAvatarUrl = imgUrl;
+        }
+
+        function startGame() {
+            username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert('من فضلك اكتب اسمك الأول عشان نسجلك في لوحة الشرف 😉');
+                return;
+            }
+
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            
+            document.getElementById('welcome-msg').innerText = `عاش يا ${username}! 🌟`;
+            document.getElementById('player-img').src = selectedAvatarUrl;
+            
+            // اختيار افتراضي للـ Border حسب الشخصية
+            if(selectedAvatarUrl.includes('girl')) {
+                document.getElementById('player-img').style.borderColor = 'var(--primary)';
+            } else {
+                document.getElementById('player-img').style.borderColor = 'var(--secondary)';
+            }
+        }
+
+        function addDonation() {
+            if (currentAmount < 400) {
+                currentAmount += 20;
+                updateUI();
+            }
+            
+            if (currentAmount >= 400) {
+                setTimeout(() => {
+                    alert('🎉 مبروك يا بطل! وصلت لـ 400 جنيه وسلمت طبق اللحمة لأسرة محتاجة! ربنا يجعله في ميزان حسناتك ❤️');
+                }, 500);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('current-amount').innerText = currentAmount;
+            let percentage = (currentAmount / 400) * 100;
+            document.getElementById('progress').style.width = percentage + '%';
+            document.getElementById('player-img').style.left = percentage + '%';
+        }
+    </script>
+</body>
+</html>
